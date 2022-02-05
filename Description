@@ -1,0 +1,87 @@
+# Weather-Monitoring-System
+In this project we create a smart weather monitoring system which sends live 
+updates to the user with the help of the Blynk app.
+This feed can be accessed with any device on any network using the Blynk app’s 
+share feature.
+The following project can be useful to monitor the conditions of a certain place 
+without actually having to be there. We use the DHT 11 sensor to monitor the 
+humidity and the temperature of the environment around the area where this 
+‘weather monitoring system’ is kept. A rain sensor is also attached which shows 
+the amount of rainfall (in %).
+There are additional features in the app where you can send tweets or emails to 
+the user. This is again a very useful tool as the user can be notified if the 
+temperature outside is too hot or if the humidity is high (or rain %), the user can 
+be cautious to expect rainfall or high temperatures.
+MATERIALS USED:
+ITEM QUANTITY
+NODEMCU 1.0 1
+RAIN SENSOR 1
+DHT 11 1
+BREADBOARD 1
+WIRES 3 coils
+BOX 1
+WORKING:
+The DHT11 sensor and the rain sensor are connected to the NODEMCU 1.0
+board via the necessary connections. The board is then supplied with power 
+through the USB port and the program starts.
+Step -1: Setting up the Wi-Fi connection
+ 
+ The board communicates with the Blynk app through Wi-Fi. In the 
+source code, it can be seen that after including all the libraries, we set up the wifi 
+connection.
+// SETTING UP WIFI CONNECTIONS
+char auth[] = "71UPmZgb8-cG4a-oUJwF0CigLrsGePNk"; // Auth code sent by Blynk
+char ssid[] = "wifie_name"; //WIFI Name
+char pass[] = "wifie_password"; //WIFI Password
+The ‘char auth[]’ is a string which contains the authorization code sent by Blynk. 
+This authorization code is necessary as without this code, the board will not send 
+data to the app. This is a security measure by the app itself because someone who 
+does not have the authorization code cannot access the data being sent by the board.
+Step -2: Setting up the DHT11
+ The DHT11 is simply set up by defining the DHT pin with its number and 
+the DHT type as 11.
+//DHT 11
+#define DHTPIN 2 // (D4)
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+Step -3: The setup() function
+ 
+ The setup() function contains three lines.
+dht.begin();
+Serial.begin(9600);
+Blynk.begin(auth, ssid, pass);
+The dht.begin() means to start the DHT.
+The Serial.begin(9600) means to start transmitting data (baud rate).
+The Blynk.begin(auth.ssid,pass) means to begin transmitting data to the blynk
+app to the person with the authorization code ‘auth’ via the network who’s ssid and 
+password are the ones defined in step 1.
+Step -4: The loop() function
+ The loop function is the one that keeps on executing repeatedly.
+We have defined three variables namely h,t,rain.
+float h = dht.readHumidity(); //humidity (in %)
+float t = dht.readTemperature(); //temperature (in C)
+float rain=(1-((float)analogRead(A0)/1024))*100; //rain (in %)
+• The ‘h’ variable stores the humidity using the .readHumidity() function.
+• The ‘t’ variable stores the temperature using the .readTemperature() 
+function.
+• The ‘rain’ variable stores the value (in %). The rain sensor is connected to 
+the board via the pin A0. The rain sensor by default gives us the value 
+from 0 to 1024. We then convert this reading to a float value.
+If A0 gives lets say a value of 50, then we convert it to 50.00
+The lower the value given by the rain sensor the higher the amount of 
+water there is on it.
+We then divide the value by 1024. 
+So, 50.00/1024 = 0.048828125
+Now we subtract it from 1.
+1-0.048828125 = 0.51171875
+We then multiply it with 100 to give us the value in percentage.
+Therefore, 
+rain = 0.51171875 * 100
+ = 51.17% 
+In the end the ‘rain’ variable gets the value of 51.17%.
+• Now we ‘virtually write’ these values to the Blynk app’s ‘virtual pins’.
+Blynk.virtualWrite(V5, h); //V5 is for Humidity
+Blynk.virtualWrite(V6, t); //V6 is for Temperature
+Blynk.virtualWrite(V7, rain); //V7 is for Rain
+ These pins are setup during the creation of the project in the Blynk app.
+• We also print the values of ‘h’,’t’,’rain’ on the serial monitor.
